@@ -10,12 +10,12 @@ jobs:
   sast:
     name: SAST (Semgrep)
     runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
     steps:
       - uses: actions/checkout@v4
       - name: Run Semgrep
-        uses: semgrep/semgrep-action@v1
-        with:
-          config: p/owasp-top-ten
+        run: semgrep scan --config=p/owasp-top-ten --error
 
   secrets-scan:
     name: Secrets Scanning (Gitleaks)
