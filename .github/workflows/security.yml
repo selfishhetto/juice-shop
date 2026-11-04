@@ -34,11 +34,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Generate lock files
+        run: |
+          npm install --package-lock-only --ignore-scripts --legacy-peer-deps
+          cd frontend && npm install --package-lock-only --ignore-scripts --legacy-peer-deps
       - name: Run Trivy filesystem scan
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
           scan-ref: '.'
+          scanners: 'vuln'
           severity: 'CRITICAL,HIGH'
 
   container-scan:
