@@ -48,6 +48,7 @@ jobs:
           scan-ref: '.'
           scanners: 'vuln'
           severity: 'CRITICAL,HIGH'
+          exit-code: '1'
 
   container-scan:
     name: Container Scan (Trivy - Docker image)
@@ -61,3 +62,26 @@ jobs:
         with:
           image-ref: 'juice-shop-local'
           severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+
+  dast:
+    name: DAST (OWASP ZAP)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t juice-shop-local .
+      - name: Start Juice Shop
+        run: |
+          docker run -d --name juice-shop -p 3000:3000 juice-shop-local
+          echo "Waiting for app to start..."
+          for i in $(seq 1 30); do
+            curl -s http://localhost:3000 > /dev/null && break
+            sleep 2
+          done
+      - name: Run ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: 'http://localhost:3000'
+          fail_action: true
+          allow_issue_writing: false
