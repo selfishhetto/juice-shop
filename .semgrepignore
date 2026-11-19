@@ -4,3 +4,8 @@ data/static/codefixes/
 routes/login.ts
 routes/search.ts
 routes/userProfile.ts
+
+# Upstream Heroku deploy step, not used by this project's pipeline
+.github/workflows/ci.yml
+# Smoke-test image, not shipped to production
+test/smoke/Dockerfile
