@@ -1,0 +1,6 @@
+
+# Intentionally vulnerable Juice Shop code (accepted risk, documented in report)
+data/static/codefixes/
+routes/login.ts
+routes/search.ts
+routes/userProfile.ts

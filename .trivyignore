@@ -1,0 +1,4 @@
+# lodash 2.4.2 via sanitize-html 1.4.2 (intentionally vulnerable Juice Shop component)
+CVE-2019-10744
+# tar 6.2.1 via sqlite3/node-gyp (build-time only)
+CVE-2026-59873
