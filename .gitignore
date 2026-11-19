@@ -72,3 +72,4 @@ config/*.yml
 .playwright-mcp/
 cypress/screenshots/
 encryptionkeys/jwt.key
+infrastructure/terraform/certs/
