@@ -24,7 +24,6 @@ import robots from 'express-robots-txt'
 import cookieParser from 'cookie-parser'
 import * as Prometheus from 'prom-client'
 import swaggerUi from 'swagger-ui-express'
-import featurePolicy from 'feature-policy'
 import { IpFilter } from 'express-ipfilter'
 // @ts-expect-error FIXME due to non-existing type definitions for express-security.txt
 import securityTxt from 'express-security.txt'
@@ -186,13 +185,25 @@ function configureApp (app: ReturnType<typeof express>, seq: typeof sequelize) {
   /* Security middleware */
   app.use(helmet.noSniff())
   app.use(helmet.frameguard())
-  // app.use(helmet.xssFilter()); // = no protection from persisted XSS via RESTful API
-  app.disable('x-powered-by')
-  app.use(featurePolicy({
-    features: {
-      payment: ["'self'"]
+  app.use(helmet.contentSecurityPolicy({
+    useDefaults: false,
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://cdnjs.cloudflare.com'],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com'],
+      imgSrc: ["'self'", 'data:', 'https:'],
+      fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
+      connectSrc: ["'self'", 'ws:', 'wss:'],
+      frameAncestors: ["'self'"],
+      objectSrc: ["'none'"]
     }
   }))
+  app.use((req, res, next) => { res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless'); next() })
+  app.use(helmet.crossOriginOpenerPolicy({ policy: 'same-origin' }))
+  app.use(helmet.crossOriginResourcePolicy({ policy: 'same-origin' }))
+  app.use((req, res, next) => { res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()'); next() })
+  // app.use(helmet.xssFilter()); // = no protection from persisted XSS via RESTful API
+  app.disable('x-powered-by')
 
   /* Hiring header */
   app.use((req: Request, res: Response, next: NextFunction) => {
